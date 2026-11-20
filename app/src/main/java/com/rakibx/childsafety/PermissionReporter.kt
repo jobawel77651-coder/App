@@ -7,17 +7,9 @@ import android.os.Build
 import org.json.JSONObject
 
 object PermissionReporter {
-    private fun state(context: Context, permission: String, runtime: Boolean = true): String {
+    private fun state(context: Context, permission: String): String {
         val granted = context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
-        if (granted) return "ALLOWED"
-        if (!runtime) return "NOT_GRANTED"
-        if (Build.VERSION.SDK_INT < 23) return "NOT_GRANTED"
-        val flags = try {
-            context.packageManager.getPermissionFlags(permission, context.packageName, android.os.Process.myUserHandle())
-        } catch (_: Exception) { 0 }
-        val userSet = flags and PackageManager.FLAG_PERMISSION_USER_SET != 0
-        val userFixed = flags and PackageManager.FLAG_PERMISSION_USER_FIXED != 0
-        return if (userSet || userFixed) "DENIED" else "NOT_REQUESTED"
+        return if (granted) "ALLOWED" else "NOT_GRANTED"
     }
 
     fun snapshot(context: Context): JSONObject = JSONObject().apply {
